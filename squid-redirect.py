@@ -35,8 +35,8 @@ def load_data(*sources):
     """
     Normalize sources from `python_dict`, `json_string` or `json_filename` -> `python_dict`
 
-    >>> load_data({'a': 1}, '{"b": 2}')
-    {'a': 1, 'b': 2}
+    >>> load_data({'a': 1}, '{"b": 2}') == {'a': 1, 'b': 2}
+    True
     """
     def _open_source(source):
         assert source
