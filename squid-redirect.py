@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 ## -*- coding: utf-8 -*-
 
+import os
 import logging
 import sys
 import re
@@ -44,7 +45,8 @@ def load_data(*sources):
         if isinstance(source, str) and source.startswith('{') and source.endswith('}'):
             return json.loads(source)
         if os.path.exists(source):
-            return json.load(source)
+            with open(source) as filehandle:
+                return json.load(filehandle)
 
     return dict(ChainMap(*map(_open_source, sources)))
 
