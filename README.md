@@ -3,11 +3,15 @@ squid-redirect
 
 A `json` configurable `squid`(3.5) `url_rewrite_program` written in `python3`.
 
+Usecase: We wanted to transparently point our ios simulators at different content servers without modifying the ios application under test.
+
+Each test run on our ci-servers can transparently alias different endpoints.
+
 
 Examples
 --------
 
-Try the flow in a terminal
+### 1.) Trial the `url_rewrite_program` flow in a terminal
 
 ```bash
     python3 squid-redirect.py --rewrite '{"www\.capitalfm\.com": "www.capitalfm.development.int.thisisglobal.com"}'
@@ -15,7 +19,7 @@ Try the flow in a terminal
     0 OK rewrite-url="http://www.capitalfm.development.int.thisisglobal.com/_build/"
 ```
 
-Edit your `squid.conf` to include the `url_rewrite_program`
+### 2.) Edit your `squid.conf` to include the `url_rewrite_program`
 
 ```
 
@@ -24,7 +28,7 @@ Edit your `squid.conf` to include the `url_rewrite_program`
     url_rewrite_program /usr/local/bin/python3 /PATH/TO/squid-redirect.py --rewrite '{"www\.capitalfm\.com": "www.capitalfm.development.int.thisisglobal.com"}'
 ```
 
-Startup an example `squid` server
+### 3.) Startup an example `squid` server
 
 ```bash
     cat <<EOF > rules.json
@@ -47,18 +51,41 @@ Startup an example `squid` server
     squid -N -f ${SQUID_CONF}
 ```
 
+### 4.) Setup `osx` transparent `webproxy`.
+
+Programs that respect `webproxy`:
+* `chrome`
+* `ios_simulator`
+
+but not system level programs like:
+* `firefox`
+* `curl`
+
+```bash
+    NETWORK_DEVICE="Wi-Fi"
+    PROXY_HOST="localhost"
+    PROXY_PORT="3128"
+    networksetup -setwebproxy ${NETWORK_DEVICE} ${PROXY_HOST} ${PROXY_PORT}
+    networksetup -setsecurewebproxy ${NETWORK_DEVICE} ${PROXY_HOST} ${PROXY_PORT}
+
+    networksetup -setwebproxy ${NETWORK_DEVICE} "" ""
+    networksetup -setsecurewebproxy ${NETWORK_DEVICE} "" ""
+    networksetup -setwebproxystate ${NETWORK_DEVICE} off
+    networksetup -setsecurewebproxystate ${NETWORK_DEVICE} off
+```
+
 
 References
 ----------
 
-### Documentation
+### Squid Documentation
 
 * https://wiki.squid-cache.org/Features/Redirectors
 * http://www.squid-cache.org/Doc/config/url_rewrite_program/
 * http://www.squid-cache.org/Doc/config/url_rewrite_children/
 * http://www.squid-cache.org/Doc/config/url_rewrite_extras/
 
-### Example Implementations
+### Alternate Example Implementations of `url_rewrite_program`
 
 * https://www.mindchasers.com/dev/app-squid-redirect
 * https://gofedora.com/how-to-write-custom-redirector-rewritor-plugin-squid-python/
