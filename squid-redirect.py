@@ -103,6 +103,7 @@ def process_squid_request(request_line, rewrite_rules={}, redirect_rules={}, **a
 
 
 def process_input_output_handlers(input_handle=sys.stdin, output_handle=sys.stdout, **args):
+    log.debug(f'start: {__file__} {args}')
     while True:
         request_line = input_handle.readline()
         if not request_line or not request_line.strip():
@@ -112,6 +113,7 @@ def process_input_output_handlers(input_handle=sys.stdin, output_handle=sys.stdo
         log.debug(f'response: {response}')
         output_handle.write(f'{response}\n')
         output_handle.flush()
+    log.debug(f'end: {__file__}')
 
 
 
@@ -133,8 +135,7 @@ def get_args():
     parser.add_argument('--rewrite', nargs='+', help='json filename or string with key:value to rewrite', default=())
     parser.add_argument('--redirect', nargs='+', help='json filename or string with key:value to redirect', default=())
 
-    parser.add_argument('-l', '--logfile', action='store', help='')
-    #parser.add_argument('-v', '--verbose', action='store_true', help='', default=False)
+    parser.add_argument('--logfile', action='store', help='debug data logfile to write. Details start,stop,request,response')
     parser.add_argument('--postmortem', action='store_true', help='Automatically drop into pdb shell on exception. Used for debuging')
     parser.add_argument('--version', action='version', version=VERSION)
 
@@ -146,7 +147,6 @@ if __name__ == "__main__":
     args = get_args()
     if args['logfile']:
         logging.basicConfig(filename=args['logfile'], level=logging.DEBUG)
-    log.debug(f'start: {__file__} {args}')
 
     def main(**args):
         process_input_output_handlers(
@@ -162,4 +162,3 @@ if __name__ == "__main__":
     else:
         main(**args)
 
-    log.debug(f'end: {__file__}')
