@@ -3,9 +3,7 @@ squid-redirect
 
 A `json` configurable `squid`(3.5) `url_rewrite_program` written in `python3`.
 
-Usecase: We wanted to transparently point our ios simulators at different content servers without modifying the ios application under test.
-
-Each test run on our ci-servers can transparently alias different endpoints.
+Usecase: We wanted to transparently point our ios simulators at different content servers without modifying the ios application under test. Each test run on our ci-servers can transparently alias different endpoints.
 
 
 Examples
@@ -19,16 +17,7 @@ Examples
     0 OK rewrite-url="http://www.capitalfm.development.int.thisisglobal.com/_build/"
 ```
 
-### 2.) Edit your `squid.conf` to include the `url_rewrite_program`
-
-```
-
-    url_rewrite_children 3 startup=0 idle=1 concurrency=1
-    url_rewrite_extras ""
-    url_rewrite_program /usr/local/bin/python3 /PATH/TO/squid-redirect.py --rewrite '{"www\.capitalfm\.com": "www.capitalfm.development.int.thisisglobal.com"}'
-```
-
-### 3.) Startup an example `squid` server
+### 2.) Startup an example `squid` server using our `url_rewrite_program`
 
 ```bash
     cat <<EOF > rules.json
@@ -51,13 +40,13 @@ Examples
     squid -N -f ${SQUID_CONF}
 ```
 
-### 4.) Setup `osx` transparent `webproxy`.
+### 3.) Setup `osx` transparent `webproxy`.
 
 Programs that respect `webproxy`:
 * `chrome`
 * `ios_simulator`
 
-but not system level programs like:
+`webproxy` is not sufficient for system-level programs like:
 * `firefox`
 * `curl`
 
