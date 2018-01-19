@@ -1,31 +1,52 @@
 squid-redirect
 ==============
 
-Configurable squid url redirector (python3)
+A `json` configurable `squid`(3.5) `url_rewrite_program` written in `python3`.
 
 
 Examples
 --------
 
+Try the flow in a terminal
+
+```bash
+    python3 squid-redirect.py --rewrite '{"www\.capitalfm\.com": "www.capitalfm.development.int.thisisglobal.com"}'
+    0 http://www.capitalfm.com/_build/ -
+    0 OK rewrite-url="http://www.capitalfm.development.int.thisisglobal.com/_build/"
 ```
-    url_rewrite_children 3 startup=0 idle=1 concurrency=10
+
+Edit your `squid.conf` to include the `url_rewrite_program`
+
+```
+    url_rewrite_children 3 startup=0 idle=1 concurrency=1
     url_rewrite_program /home/jenkins/tools/squid-redirect.py --rewrite '{"www.site.com": "www.replacement.com"}'
 ```
 
+Startup an example `squid` server
+
 ```bash
-    SQUID_CONF=/home/jenkins/squid.conf
-    cp /usr/local/etc/squid.conf ${SQUID_CONF}
+    SQUID_CONF_SOURCE=/usr/local/etc/squid.conf
+    SQUID_CONF=./squid.conf
+    cp ${SQUID_CONF_SOURCE} ${SQUID_CONF}
+    echo "url_rewrite_children 3 startup=0 idle=1 concurrency=1" >> ${SQUID_CONF}
+    echo 'url_rewrite_extras ""' >> ${SQUID_CONF}
     echo "url_rewrite_program $(pwd)/squid-redirect.py --rewrite $(pwd)/myrules.json" >> ${SQUID_CONF}
-    squid -k stop
-    squid -f ${SQUID_CONF}
-    #squid -k stop
+    squid -N -f ${SQUID_CONF}
 ```
 
-Reference
----------
 
-http://www.squid-cache.org/Doc/config/url_rewrite_children/
-http://www.squid-cache.org/Doc/config/url_rewrite_extras/
-https://www.mindchasers.com/dev/app-squid-redirect
-https://gofedora.com/how-to-write-custom-redirector-rewritor-plugin-squid-python/
-https://github.com/krllmnkv/rewrite-squid
+References
+----------
+
+### Documentation
+
+* https://wiki.squid-cache.org/Features/Redirectors
+* http://www.squid-cache.org/Doc/config/url_rewrite_program/
+* http://www.squid-cache.org/Doc/config/url_rewrite_children/
+* http://www.squid-cache.org/Doc/config/url_rewrite_extras/
+
+### Example Implementations
+
+* https://www.mindchasers.com/dev/app-squid-redirect
+* https://gofedora.com/how-to-write-custom-redirector-rewritor-plugin-squid-python/
+* https://github.com/krllmnkv/rewrite-squid
