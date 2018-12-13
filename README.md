@@ -20,24 +20,7 @@ Examples
 ### 2.) Startup an example `squid` server using our `url_rewrite_program`
 
 ```bash
-    cat <<EOF > rules.json
-    {
-        "www\\\\.capitalfm\\\\.com": "www.capitalfm.development.int.thisisglobal.com"
-    }
-    EOF
-
-    SQUID_CONF_SOURCE=/usr/local/etc/squid.conf
-    SQUID_CONF=./squid.conf
-    cp ${SQUID_CONF_SOURCE} ${SQUID_CONF}
-
-    cat <<EOF >> ${SQUID_CONF}
-
-    url_rewrite_children 3 startup=0 idle=1 concurrency=1
-    url_rewrite_extras ""
-    url_rewrite_program /usr/local/bin/python3 $(pwd)/squid-redirect.py --rewrite $(pwd)/rules.json
-    EOF
-
-    squid -N -f ${SQUID_CONF}
+    squid -N -f !./config.py
 ```
 
 ### 3.) Setup `osx` transparent `webproxy`.
